@@ -43,6 +43,7 @@ namespace Op11
 		{
 			var rows = chairs.GroupBy(ch => ch.Y).ToList();
 			var maxRow = rows.Select(l => l.Key).Max();
+			
 			if (rows.Count == 0) throw new ArgumentException("Empty state provided.", nameof(chairs));
 			if (rows.Count != maxRow + 1) throw new ArgumentException("Missing row.", nameof(chairs));
 			var columns = rows.Select(row => row.Select(el => el.X).Max()).ToList();
@@ -97,6 +98,35 @@ namespace Op11
 				yield return this[ch.X, ch.Y + 1];
 				if (ch.X + 1 < ColumnCount) yield return this[ch.X + 1, ch.Y + 1];
 			}
+		}
+
+		public IEnumerable<IEnumerable<Chair>> GetNeighbourLines(Chair ch)
+		{
+			bool IsInRange(int x, int y)
+			{
+				return x >= 0 && x < ColumnCount && y >= 0 && y < RowCount;
+			}
+
+			IEnumerable<Chair> GetLine(int dx, int dy)
+			{
+				var x = ch.X + dx;
+				var y = ch.Y + dy;
+				while (IsInRange(x, y))
+				{
+					yield return this[x, y];
+					x += dx;
+					y += dy;
+				}
+			}
+
+			yield return GetLine(-1, -1);
+			yield return GetLine(0, -1);
+			yield return GetLine(1, -1);
+			yield return GetLine(-1, 0);
+			yield return GetLine(1, 0);
+			yield return GetLine(-1, 1);
+			yield return GetLine(0, 1);
+			yield return GetLine(1, 1);
 		}
 	}
 
